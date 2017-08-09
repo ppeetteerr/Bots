@@ -1,15 +1,13 @@
 package bots.ticTacToe.monteCarlo;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import bots.ticTacToe.Constants;
 import bots.ticTacToe.game.Position;
 
 public class Node {
@@ -19,7 +17,7 @@ public class Node {
   public final long hash;
   public final int playerOnMove;
   // public final List<Node> childs = new ArrayList<>();
-  public final Map<Position, Node> childs = new HashMap<>();
+  public final List<Connection> connections = new ArrayList<>();
 
   public int noVisits;
   public double score;
@@ -34,24 +32,24 @@ public class Node {
     score += result[playerOnMove];
   }
 
-  public Entry<Position, Node> getRandomChild() {
+  public Connection getRandomChildConnection() {
     // TODO change to random :)
-    return childs.entrySet().iterator().next();
+    return connections.get(0);
   }
 
   public Position getBestMove() {
-    final double[][] score = new double[Constants.GRID_SIZE][Constants.GRID_SIZE];
-    for (final Entry<Position, Node> child : childs.entrySet()) {
-      score[child.getKey().row][child.getKey().col] = 1 - 1.0 * child.getValue().score / child.getValue().noVisits;
-    }
+//    final double[][] score = new double[Constants.GRID_SIZE][Constants.GRID_SIZE];
+//    for (final Entry<Position, Node> child : connections.entrySet()) {
+//      score[child.getKey().row][child.getKey().col] = 1 - 1.0 * child.getValue().score / child.getValue().noVisits;
+//    }
     
 //    LOGGER.info(ArrayUtils.toString(score));
     
-    return Collections.min(childs.entrySet(), Comparator.comparing(entry -> {
-      final Node node = entry.getValue();
+    return Collections.min(connections, Comparator.comparing(connection -> {
+      final Node node = connection.getNode();
       // ignore not visited nodes
       return node.noVisits == 0 ? 10 : 1.0 * node.score / node.noVisits;
-    })).getKey();
+    })).getPosition();
   }
 
   @Override

@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +48,7 @@ public class TreeSearch {
 
     final Position move = root.getBestMove();
 
-    LOGGER.info("Move " + move + " with score " + (1 - 1.0 * root.childs.get(move).score / root.childs.get(move).noVisits));
+//    LOGGER.info("Move " + move + " with score " + (1 - 1.0 * root.connections.get(move).score / root.connections.get(move).noVisits));
 
     return move;
   }
@@ -59,22 +58,22 @@ public class TreeSearch {
     double[] gameResult;
     depth++;
 
-    if (node.childs.isEmpty()) {
+    if (node.connections.isEmpty()) {
 
       if (!game.ended()) {
         expandChilds(game, node);
-        final Entry<Position, Node> child = node.getRandomChild();
-        game.makeMove(child.getKey(), node.playerOnMove);
-        gameResult = gameSimulator.simulate(game, child.getValue().playerOnMove);
-        child.getValue().processResult(gameResult);
+        final Connection childConnection = node.getRandomChildConnection();
+        game.makeMove(childConnection.getPosition(), node.playerOnMove);
+        gameResult = gameSimulator.simulate(game, childConnection.getNode().playerOnMove);
+        childConnection.getNode().processResult(gameResult);
       } else {
         gameResult = GameUtils.generateResult(game.gameWinner);
       }
 
     } else {
-      final Entry<Position, Node> bestChild = UCT.childWithBestUCT(node);
-      game.makeMove(bestChild.getKey(), node.playerOnMove);
-      gameResult = playFromNode(game, bestChild.getValue());
+      final Connection bestChild = UCT.childWithBestUCT(node);
+      game.makeMove(bestChild.getPosition(), node.playerOnMove);
+      gameResult = playFromNode(game, bestChild.getNode());
     }
 
     node.processResult(gameResult);
@@ -96,7 +95,7 @@ public class TreeSearch {
         nodes.put(childHash, child);
       }
 
-      parent.childs.put(position, child);
+      parent.connections.add(new Connection(position, child));
     }
   }
 

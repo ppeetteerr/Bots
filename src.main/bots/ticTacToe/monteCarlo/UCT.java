@@ -3,9 +3,6 @@ package bots.ticTacToe.monteCarlo;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Map.Entry;
-
-import bots.ticTacToe.game.Position;
 
 public class UCT {
 
@@ -15,10 +12,10 @@ public class UCT {
     Arrays.fill(logs, -1);
   }
 
-  public static Entry<Position, Node> childWithBestUCT(final Node parent) {
+  public static Connection childWithBestUCT(final Node parent) {
     final int parentVisits = parent.noVisits;
-    return Collections.max(parent.childs.entrySet(),
-        Comparator.comparing(entry -> uctValue(parentVisits, entry.getValue().score, entry.getValue().noVisits)));
+    return Collections.max(parent.connections,
+        Comparator.comparing(connection -> uctValue(parentVisits, connection.getNode().score, connection.getNode().noVisits)));
   }
 
   public static double uctValue(final int totalVisit, final double nodeWinScore, final int nodeVisit) {
